@@ -1,187 +1,284 @@
 import streamlit as st
+import sympy as sp
 
-# Page configuration
+# -----------------------------
+# PAGE CONFIGURATION
+# -----------------------------
 st.set_page_config(
-    page_title="Mafia Calculator",
-    page_icon="🖤",
+    page_title="DON CALCULATOR",
+    page_icon="🕴️",
     layout="centered"
 )
 
-# Dark Mafia CSS
+# -----------------------------
+# MAFIA STYLE CSS
+# -----------------------------
 st.markdown("""
 <style>
 
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
+
 .stApp {
-    background: #080808;
-    color: #f2f2f2;
+    background:
+        radial-gradient(circle at top, #252525 0%, #101010 40%, #050505 100%);
+    color: #eeeeee;
 }
 
-/* Main title */
-.mafia-title {
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    color: #d4af37;
     text-align: center;
-    color: #c9a227;
-    font-family: Georgia, serif;
-    font-size: 42px;
-    font-weight: bold;
-    letter-spacing: 4px;
-    margin-bottom: 5px;
 }
 
-.mafia-subtitle {
+.main-title {
+    font-family: 'Cinzel', serif;
+    color: #d4af37;
+    text-align: center;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: 4px;
+}
+
+.subtitle {
     text-align: center;
     color: #888888;
-    font-family: Georgia, serif;
-    font-size: 15px;
-    letter-spacing: 2px;
+    font-family: 'Roboto Mono', monospace;
     margin-bottom: 30px;
 }
 
-/* Calculator box */
-.calculator {
-    background: #111111;
-    border: 1px solid #4a0d0d;
-    border-radius: 18px;
-    padding: 30px;
-    box-shadow: 0 0 25px rgba(120, 0, 0, 0.25);
+.result-box {
+    background: linear-gradient(135deg, #181818, #252525);
+    border: 1px solid #d4af37;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 20px;
+    text-align: center;
 }
 
-/* Labels */
-label {
-    color: #c9a227 !important;
-    font-weight: bold !important;
-}
-
-/* Number inputs */
-div[data-baseweb="input"] {
-    background-color: #181818;
-    border: 1px solid #3d3d3d;
-    border-radius: 10px;
-}
-
-div[data-baseweb="input"] input {
-    color: white !important;
-    background-color: #181818 !important;
-}
-
-/* Select box */
-div[data-baseweb="select"] > div {
-    background-color: #181818;
-    border: 1px solid #3d3d3d;
-    color: white;
-    border-radius: 10px;
-}
-
-/* Calculate button */
-.stButton > button {
-    width: 100%;
-    background: #5c0b0b;
-    color: #f1d27a;
-    border: 1px solid #c9a227;
-    border-radius: 10px;
-    height: 50px;
-    font-size: 17px;
+.result-text {
+    color: #d4af37;
+    font-size: 30px;
+    font-family: 'Roboto Mono', monospace;
     font-weight: bold;
-    letter-spacing: 2px;
-    transition: 0.3s;
+}
+
+.stButton > button {
+    background: linear-gradient(145deg, #292929, #111111);
+    color: #d4af37;
+    border: 1px solid #d4af37;
+    border-radius: 8px;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
 .stButton > button:hover {
-    background: #8b1111;
-    color: white;
-    border-color: #f0c94a;
+    background: #d4af37;
+    color: #000000;
+    border-color: #ffffff;
 }
 
-/* Result */
-.result-box {
-    margin-top: 25px;
-    padding: 18px;
-    text-align: center;
-    background: #160909;
-    border: 1px solid #8b1111;
-    border-radius: 10px;
-    color: #c9a227;
-    font-family: Georgia, serif;
-    font-size: 24px;
-    font-weight: bold;
+div[data-baseweb="select"] > div {
+    background-color: #151515;
+    color: #ffffff;
+    border: 1px solid #444444;
 }
 
-.footer {
-    text-align: center;
-    color: #555555;
-    margin-top: 25px;
-    font-size: 12px;
-    letter-spacing: 2px;
+input {
+    background-color: #151515 !important;
+    color: white !important;
+}
+
+hr {
+    border-color: #333333;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 
-# Title
+# -----------------------------
+# HEADER
+# -----------------------------
+
 st.markdown(
-    '<div class="mafia-title">♠ MAFIA CALCULATOR ♠</div>',
+    '<div class="main-title">🕴️ DON CALCULATOR</div>',
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="mafia-subtitle">CALCULATE WITH STYLE</div>',
+    '<div class="subtitle">THE MATH FAMILY • NO MISTAKES ALLOWED</div>',
     unsafe_allow_html=True
 )
 
-# Calculator container
-st.markdown('<div class="calculator">', unsafe_allow_html=True)
 
-# Number inputs
-number1 = st.number_input(
-    "FIRST NUMBER",
-    value=0.0
+# -----------------------------
+# MODE SELECTION
+# -----------------------------
+
+mode = st.radio(
+    "Choose your operation",
+    ["🧮 Mafia Calculator", "📐 Derivative Solver"],
+    horizontal=True
 )
 
-number2 = st.number_input(
-    "SECOND NUMBER",
-    value=0.0
-)
 
-# Operation
-operation = st.selectbox(
-    "CHOOSE OPERATION",
-    [
-        "Addition",
-        "Subtraction",
-        "Multiplication",
-        "Division"
-    ]
-)
+# =========================================================
+# BASIC CALCULATOR
+# =========================================================
 
-# Calculate
-if st.button("CALCULATE"):
+if mode == "🧮 Mafia Calculator":
 
-    if operation == "Addition":
-        result = number1 + number2
+    st.subheader("🕴️ Make Your Move")
 
-    elif operation == "Subtraction":
-        result = number1 - number2
+    col1, col2 = st.columns(2)
 
-    elif operation == "Multiplication":
-        result = number1 * number2
-
-    elif operation == "Division":
-
-        if number2 == 0:
-            st.error("You cannot divide by zero.")
-            result = None
-        else:
-            result = number1 / number2
-
-    if result is not None:
-        st.markdown(
-            f'<div class="result-box">RESULT: {result}</div>',
-            unsafe_allow_html=True
+    with col1:
+        num1 = st.number_input(
+            "First Number",
+            value=0.0
         )
 
-st.markdown('</div>', unsafe_allow_html=True)
+    with col2:
+        num2 = st.number_input(
+            "Second Number",
+            value=0.0
+        )
 
-st.markdown(
-    '<div class="footer">♠ CLASS • POWER • PRECISION ♠</div>',
-    unsafe_allow_html=True
+    operation = st.selectbox(
+        "Choose Operation",
+        [
+            "➕ Addition",
+            "➖ Subtraction",
+            "✖️ Multiplication",
+            "➗ Division"
+        ]
+    )
+
+    calculate = st.button(
+        "💰 CALCULATE",
+        use_container_width=True
+    )
+
+    if calculate:
+
+        if operation == "➕ Addition":
+            result = num1 + num2
+
+        elif operation == "➖ Subtraction":
+            result = num1 - num2
+
+        elif operation == "✖️ Multiplication":
+            result = num1 * num2
+
+        elif operation == "➗ Division":
+
+            if num2 == 0:
+                st.error("🚫 The Don doesn't divide by zero.")
+                result = None
+            else:
+                result = num1 / num2
+
+        if result is not None:
+
+            st.markdown(
+                f"""
+                <div class="result-box">
+                    <div>THE DON'S ANSWER</div>
+                    <div class="result-text">{result}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+
+# =========================================================
+# DERIVATIVE SOLVER
+# =========================================================
+
+else:
+
+    st.subheader("📐 The Don's Calculus Department")
+
+    st.write(
+        "Enter a mathematical expression in terms of **x**."
+    )
+
+    expression = st.text_input(
+        "Enter your function",
+        placeholder="Example: x^3 + 2*x^2 - 5*x"
+    )
+
+    variable = st.text_input(
+        "Variable",
+        value="x"
+    )
+
+    solve = st.button(
+        "🔫 SOLVE DERIVATIVE",
+        use_container_width=True
+    )
+
+    if solve:
+
+        if expression.strip() == "":
+            st.warning("Enter a function first.")
+
+        else:
+
+            try:
+
+                x = sp.Symbol(variable)
+
+                # Convert ^ to ** for Python/SymPy
+                expression = expression.replace("^", "**")
+
+                function = sp.sympify(
+                    expression,
+                    locals={variable: x}
+                )
+
+                derivative = sp.diff(
+                    function,
+                    x
+                )
+
+                st.markdown(
+                    f"""
+                    <div class="result-box">
+                        <div>ORIGINAL FUNCTION</div>
+                        <div class="result-text">
+                            {sp.latex(function)}
+                        </div>
+
+                        <br>
+
+                        <div>THE DON'S DERIVATIVE</div>
+                        <div class="result-text">
+                            {sp.latex(derivative)}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.success(
+                    f"Derivative: {derivative}"
+                )
+
+            except Exception:
+                st.error(
+                    "🚫 The Don couldn't understand that expression. "
+                    "Check your mathematical syntax."
+                )
+
+
+# -----------------------------
+# FOOTER
+# -----------------------------
+
+st.divider()
+
+st.caption(
+    "🕴️ DON CALCULATOR • Powered by Python + Streamlit + SymPy"
 )
